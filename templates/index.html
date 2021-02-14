@@ -1,0 +1,16 @@
+{% extends "inherit.html" %}
+
+
+{% block content %}
+<div class="container text-center p-5">
+  <form action="/upload" enctype="multipart/form-data" method="POST"> 
+    <div class="mb-3">
+      <label for="formFile" class="form-label">File Upload</label>
+      <input class="form-control" type="file" name="pic" required>
+    </div>
+    <input class="btn btn-outline-secondary" type="submit" value="Upload a file">
+  </form>
+</div>
+
+{% endblock %}
+
