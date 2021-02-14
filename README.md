@@ -2,7 +2,7 @@
 
 ## Setup
 
-### Systemctl
+### Systemd Service
 
 ```
 [Unit]
@@ -25,7 +25,7 @@ WantedBy=multi-user.target
 ```
 server {
     listen 80;
-    server_name dijx.xyz www.dijx.xyz;
+    server_name domain.xyz www.domain.xyz;
 
     location / {
         include proxy_params;
