@@ -6,11 +6,10 @@
   <div class="container-fluid text-left px-5 pt-5 ">
     All files<br>
   <hr class="my-0">
-  {%for i in (t)%}
+  {%for i in (files)%}
   <a href="/{{i.name}}">{{i.name}}</a><br>
   {%endfor%}
   <hr class="my-0">
   </div>
 
 {% endblock %}
-

@@ -1,0 +1,12 @@
+{% extends "inherit.html" %}
+
+
+{% block content %}
+{{user.invite}}
+<div class="container text-center p-5">
+  <form action="/invite/" method="POST">
+    <input class="btn btn-outline-secondary" type="submit" value="Create invite code">
+  </form>
+</div>
+
+{% endblock %}

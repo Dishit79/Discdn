@@ -1,21 +1,73 @@
-from flask import Flask, request, Response, render_template
+from flask import Flask, request, Response, render_template,session, redirect
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from functools import wraps
+import uuid
 
 from db import db_init, db
-from model import Files
+from model import Files,User
 
 
 app = Flask(__name__)
-# SQLAlchemy conficg. Read more: https://flask-sqlalchemy.palletsprojects.com/en/2.x/
+app.secret_key = 'somesecretkeythatonlyishouldknow'
+# SQLAlchemy config. Read more: https://flask-sqlalchemy.palletsprojects.com/en/2.x/
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///files.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db_init(app)
 
+def logged_in(f):
+    @wraps(f)
+    def logged_in_check(*args, **kwargs):
+        try:
+            if not session['key']:
+                print('hi')
+                return redirect('/login')
+        except:
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return logged_in_check
+
 
 @app.route('/')
+@logged_in
 def hello_world():
     return render_template("index.html")
 
+@app.route('/<id>/')
+def view(id):
+    if id.isnumeric():
+      img = Files.query.filter_by(id=id).first()
+    else:
+      img = Files.query.filter_by(name=id).first()
+
+    if not img:
+        return 'Img Not Found!', 404
+
+    return Response(img.img, mimetype=img.mimetype)
+
+@app.route('/files/')
+@logged_in
+def files():
+  files1 = Files.query.filter_by(user=session['key'])
+  return render_template("files.html", files=files1)
+
+@app.route('/settings/')
+def settings():
+  user = User.query.filter_by(key=session['key']).first()
+  return render_template("settings.html", user=user)
+
+@app.route('/signup/')
+def signup():
+    return render_template("signup.html")
+
+@app.route('/login/')
+def login():
+    return render_template("login.html")
+
+@app.route('/logout/')
+def logout():
+    session.pop('key', None)
+    return redirect("/")
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -27,31 +79,56 @@ def upload():
     mimetype = pic.mimetype
     if not filename or not mimetype:
         return 'Bad upload!', 400
-    img = Files(img=pic.read(), name=filename, mimetype=mimetype)
+    img = Files(img=pic.read(),user=session['key'], name=filename, mimetype=mimetype)
     db.session.add(img)
     db.session.commit()
 
-    return 'File Uploaded!', 200
+    return redirect('/files/')
 
-@app.route('/<id>')
-def ddimg(id):
-    if id.isnumeric():
-      img = Files.query.filter_by(id=id).first()
-    else:
-      img = Files.query.filter_by(name=id).first()
-   
-    if not img:
-        return 'Img Not Found!', 404
+@app.route('/createuser/', methods=['POST'])
+def createuser():
+    result = request.form.to_dict()
+    code = User.query.filter_by(invite=result['code']).first()
+    if not code:
+        return 'no code', 401
+    code.invite = str(uuid.uuid1().hex)[:6]
+    db.session.commit()
+    password = generate_password_hash(result['password'], method='sha256')
+    user = User(username=result['username'],password=password, external_id=None, admin=True, key=str(uuid.uuid1()))
+    db.session.add(user)
+    db.session.commit()
 
-    return Response(img.img, mimetype=img.mimetype)
-   
+    return redirect('/login')
 
+@app.route('/authorize/', methods=['POST'])
+def authorize():
+    result = request.form.to_dict()
+    session.pop('key', None)
+    user = User.query.filter_by(username=result['username']).first()
+    if user:
+        if check_password_hash(user.password, result['password']):
+            session['key'] = user.key
+            return redirect('/')
 
+    return '401', 401
 
-@app.route('/tt')
-def t():
-  t = Files.query.all()
-  return render_template("files.html", t=t)
+@app.route('/invite/', methods=['POST'])
+def create_invite():
+    user = User.query.filter_by(key=session['key']).first()
+    if user:
+        user.invite = str(uuid.uuid1().hex)[:6]
+        db.session.commit()
+        return redirect('/settings')
+
+    return '401', 401
+
+@app.route('/t/<name>/')
+def test(name):
+    user = User.query.filter_by(user_id=807588382251824434).first()
+    if user:
+        user.invite = str(uuid.uuid1().hex)[:6]
+
+    return 200
 
 if __name__ == "__main__":
-    app.run(debug=True,host="0.0.0.0", port=8080)
+    app.run(debug=True)
