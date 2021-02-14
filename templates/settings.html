@@ -2,11 +2,57 @@
 
 
 {% block content %}
-{{user.invite}}
-<div class="container text-center p-5">
-  <form action="/invite/" method="POST">
-    <input class="btn btn-outline-secondary" type="submit" value="Create invite code">
-  </form>
-</div>
+
+<div class="container-fluid">
+  <div class="row text-center">
+    <div class="col p-4">
+      <div class="card">
+        <div class="card-header">
+          Invite Code
+        </div>
+        <div class="card-body">
+          <h5 class="card-title mt-2">{{user.invite or 'None'}} </h5>
+            <form action="/invite/" method="POST">
+              <input class="btn btn-outline-secondary" type="submit" value="Create invite code">
+            </form>
+          </div>
+        </div>
+        </div>
+        <div class="col p-4">
+          <div class="card">
+            <div class="card-header">
+              User Statistic
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Username: {{user.username}} <br> ID: {{user.id}} <br> Admin: {{user.admin}}</h5>
+              </div>
+            </div>
+            </div>
+      </div>
+      <div class="row text-center">
+        <div class="col p-4">
+          <div class="card">
+            <div class="card-header">
+              Reset Password
+            </div>
+            <div class="card-body">
+                <form action="/resetpas/" method="POST">
+                  <div class="mb-3">
+                     <input type="password" class="form-control" name="password" required>
+                   </div>
+                  <input class="btn btn-outline-secondary" type="submit" value="Reset Password">
+                </form>
+              </div>
+            </div>
+            </div>
+          </div>
+    </div>
+
+
+{% for message in get_flashed_messages() %}
+  <div class="alert alert-dark" role="alert">
+    {{ message }}
+  </div>
+{% endfor %}
 
 {% endblock %}

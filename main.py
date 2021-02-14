@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, render_template,session, redirect
+from flask import Flask, request, Response, render_template,session, redirect,flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
@@ -52,6 +52,7 @@ def files():
   return render_template("files.html", files=files1)
 
 @app.route('/settings/')
+@logged_in
 def settings():
   user = User.query.filter_by(key=session['key']).first()
   return render_template("settings.html", user=user)
@@ -94,7 +95,7 @@ def createuser():
     code.invite = str(uuid.uuid1().hex)[:6]
     db.session.commit()
     password = generate_password_hash(result['password'], method='sha256')
-    user = User(username=result['username'],password=password, external_id=None, admin=True, key=str(uuid.uuid1()))
+    user = User(username=result['username'],password=password, external_id=None, admin=False, key=str(uuid.uuid1()), invite='None')
     db.session.add(user)
     db.session.commit()
 
@@ -109,18 +110,36 @@ def authorize():
         if check_password_hash(user.password, result['password']):
             session['key'] = user.key
             return redirect('/')
+        else:
+            flash('Password is incorrect')
+            return redirect('/login')
+    else:
+        flash('Username is incorrect')
+        return redirect('/login')
 
-    return '401', 401
 
 @app.route('/invite/', methods=['POST'])
 def create_invite():
     user = User.query.filter_by(key=session['key']).first()
     if user:
-        user.invite = str(uuid.uuid1().hex)[:6]
-        db.session.commit()
-        return redirect('/settings')
+        if user.admin == True:
+            user.invite = str(uuid.uuid1().hex)[:6]
+            db.session.commit()
+            return redirect('/settings')
+        else:
+            flash('Sorry you need admin for that')
+            return redirect('/settings')
 
-    return '401', 401
+@app.route('/resetpas/', methods=['POST'])
+def password_reset():
+    user = User.query.filter_by(key=session['key']).first()
+    if user:
+        user.password = str(generate_password_hash(request.form['password'], method='sha256'))
+        db.session.commit()
+        session.pop('key', None)
+        return redirect('/')
+
+    return 405
 
 @app.route('/t/<name>/')
 def test(name):
