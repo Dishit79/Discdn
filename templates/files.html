@@ -7,9 +7,26 @@
     All files<br>
   <hr class="my-0">
   {%for i in (files)%}
-  <a href="/{{i.name}}">{{i.name}}</a><br>
+  <a href="/files/{{i.name}} ">{{i.name}}</a>
+  <button class="btn" onclick="clip_div('{{i.name}}')"><img src="https://img.icons8.com/material-outlined/20/000000/copy-link.png"/></button><br>
   {%endfor%}
   <hr class="my-0">
   </div>
 
+{% endblock %}
+
+{% block script%}
+<script>
+function clip_div(a_string){
+    var input = document.createElement('input')
+    input.id="__copyText__";
+    input.value = window.location.href + a_string;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand("copy");
+    var txt = input.value
+    input.remove()
+}
+
+</script>
 {% endblock %}

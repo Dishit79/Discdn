@@ -20,7 +20,6 @@ def logged_in(f):
     def logged_in_check(*args, **kwargs):
         try:
             if not session['key']:
-                print('hi')
                 return redirect('/login')
         except:
             return redirect('/login')
@@ -33,12 +32,9 @@ def logged_in(f):
 def hello_world():
     return render_template("index.html")
 
-@app.route('/<id>/')
-def view(id):
-    if id.isnumeric():
-      img = Files.query.filter_by(id=id).first()
-    else:
-      img = Files.query.filter_by(name=id).first()
+@app.route('/files/<file>.<mimetype>')
+def view(file,mimetype):
+    img = Files.query.filter_by(name=f'{file}.{mimetype}').first()
 
     if not img:
         return 'Img Not Found!', 404
@@ -86,7 +82,7 @@ def upload():
 
     return redirect('/files/')
 
-@app.route('/createuser/', methods=['POST'])
+@app.route('/user/create/', methods=['POST'])
 def createuser():
     result = request.form.to_dict()
     code = User.query.filter_by(invite=result['code']).first()
@@ -101,7 +97,7 @@ def createuser():
 
     return redirect('/login')
 
-@app.route('/authorize/', methods=['POST'])
+@app.route('/user/authorize/', methods=['POST'])
 def authorize():
     result = request.form.to_dict()
     session.pop('key', None)
@@ -111,14 +107,14 @@ def authorize():
             session['key'] = user.key
             return redirect('/')
         else:
-            flash('Password is incorrect')
+            flash('Password is incorrect.')
             return redirect('/login')
     else:
-        flash('Username is incorrect')
+        flash('Username is incorrect.')
         return redirect('/login')
 
 
-@app.route('/invite/', methods=['POST'])
+@app.route('/user/invite/', methods=['POST'])
 def create_invite():
     user = User.query.filter_by(key=session['key']).first()
     if user:
@@ -127,10 +123,10 @@ def create_invite():
             db.session.commit()
             return redirect('/settings')
         else:
-            flash('Sorry you need admin for that')
+            flash('Sorry, you need admin for that.')
             return redirect('/settings')
 
-@app.route('/resetpas/', methods=['POST'])
+@app.route('/user/reset/', methods=['POST'])
 def password_reset():
     user = User.query.filter_by(key=session['key']).first()
     if user:
@@ -141,13 +137,6 @@ def password_reset():
 
     return 405
 
-@app.route('/t/<name>/')
-def test(name):
-    user = User.query.filter_by(user_id=807588382251824434).first()
-    if user:
-        user.invite = str(uuid.uuid1().hex)[:6]
-
-    return 200
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0')
