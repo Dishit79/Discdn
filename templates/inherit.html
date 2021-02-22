@@ -8,8 +8,6 @@
 	 crossorigin="anonymous">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
-
 </head>
 
 <body>
@@ -31,12 +29,17 @@
   </div>
 </nav>
 
-
+<main style="padding-bottom: 64px;">
 {% block content %}{% endblock %}
-
-
+</main>
 
 </body>
+<footer class="bg-light fixed-bottom">
+    <div class="container text-center pt-3">
+      <p class="text-muted"> DisCloud | Made by <a	style="text-decoration: none;" href='https://github.com/Dishit79'>Dishit79</a></p>
+    </div>
+</footer>
+
 {% block script %}{% endblock %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 
