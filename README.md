@@ -5,13 +5,14 @@ Python based cdn for posting your files. As this is a python project there are c
 To run DisCloud instance on your local machine.
 
 1. Install the code with `git clone https://github.com/Dishit79/Python-cdn.git`
-2. Create .env file like the one bellow:
+2. Install all dependencies `pip install -r requirements.txt`
+3. Create .env file like the one bellow:
 ```
 CLIENT_ID="Discord client id" #If do not want to enable discord login, just put in a random string
 CLIENT_SECRET="Discord client secret"
 ADMIN_ACC_CODE="DISHIT" #The invite code which creates Admin accounts (never share this with anyone and reset after every use)
 ```
-3. Run the script with `python main.py`
+4. Run the script with `python main.py`
 
 
 
