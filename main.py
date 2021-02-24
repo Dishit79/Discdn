@@ -49,14 +49,21 @@ def view(file,mimetype):
 @app.route('/files/')
 @logged_in
 def files():
-  files1 = Files.query.filter_by(user=session['key'])
-  return render_template("files.html", files=files1)
+    files1 = Files.query.filter_by(user=session['key'])
+    return render_template("files.html", files=files1)
+
+@app.route('/manage/')
+@logged_in
+def view_pages():
+    files1 = Files.query.filter_by(user=session['key'])
+    return render_template("manage.html", files=files1)
 
 @app.route('/settings/')
 @logged_in
 def settings():
-  user = User.query.filter_by(key=session['key']).first()
-  return render_template("settings.html", user=user)
+    user = User.query.filter_by(key=session['key']).first()
+    print('rr')
+    return render_template("settings.html", user=user)
 
 @app.route('/signup/')
 def signup():
@@ -90,6 +97,25 @@ def upload():
     db.session.commit()
 
     return redirect('/files/')
+
+@app.route('/files/manage/id=<num>', methods=['POST'])
+def files_manage(num):
+    user = User.query.filter_by(key=session['key']).first()
+    if user:
+        if 'delete' in request.form:
+            files1 = Files.query.filter_by(id=num).delete()
+            db.session.commit()
+            return redirect('/manage/')
+        if 'rename' in request.form:
+            files1 = Files.query.filter_by(id=num).first()
+            rename = request.form["rename-name"]
+            if rename in ('',' '):
+                flash('Please rename the file correctly.')
+                return redirect('/manage/')
+            files1.name= f'{rename}.{files1.name[-3:]}'
+            db.session.commit()
+            return redirect('/manage/')
+    return 'test', 400
 
 @app.route('/user/create/', methods=['POST'])
 def createuser():
@@ -175,4 +201,4 @@ def password_reset():
 
 
 if __name__ == "__main__":
-    app.run(debug=True,host='0.0.0.0')
+    app.run(debug=True)

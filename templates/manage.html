@@ -1,0 +1,30 @@
+{% extends "inherit.html" %}
+
+{% block title %}Manage{% endblock %}
+
+{% block content %}
+
+  <div class="container-fluid text-left px-5 pt-5 ">
+    All files<br>
+  <hr class="my-0">
+  {%for i in (files)%}
+  <div>
+  <a href="/files/{{i.name}}">{{i.name}}</a>
+  <form action="/files/manage/id={{i.id}}" method="POST">
+  <input type="text" class="form" placeholder="Rename" name="rename-name">
+  <input class="btn" type="submit" name="rename" value="Rename"/>
+  <input class="btn" type="submit" name="delete" value="Delete"><br>
+  </form>
+  {%endfor%}
+  </div>
+  <hr class="my-0">
+  </div>
+
+  {% for message in get_flashed_messages() %}
+  <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {%endfor%}
+
+{% endblock %}
