@@ -44,7 +44,7 @@ WantedBy=multi-user.target
 ```
 server {
     listen 80;
-    server_name domain.xyz www.domain.xyz;
+    server_name domain.xyz;
 
     location / {
         include proxy_params;

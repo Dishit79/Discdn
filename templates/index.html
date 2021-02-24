@@ -7,10 +7,25 @@
   <form action="/upload" enctype="multipart/form-data" method="POST">
     <div class="mb-3">
       <label for="formFile" class="form-label">File Upload</label>
-      <input class="form-control" type="file" name="pic" required>
+      <input class="form-control" type="file" name="file" id="submit_file" required>
     </div>
     <input class="btn btn-outline-secondary" type="submit" value="Upload a file">
   </form>
 </div>
 
+{% endblock %}
+
+{% block script %}
+<script>
+const form = document.getElementById("submit_file");
+const fileInput = document.getElementById("submit_file");
+
+fileInput.addEventListener('change', () => {
+  form.submit();
+});
+
+window.addEventListener('paste', e => {
+  fileInput.files = e.clipboardData.files;
+});
+</script>
 {% endblock %}

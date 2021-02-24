@@ -84,15 +84,19 @@ def logout():
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    pic = request.files['pic']
-    if not pic:
-        return 'No pic uploaded!', 400
+    file = request.files['file']
+    if not file:
+        return 'No file uploaded!', 400
 
-    filename = secure_filename(pic.filename)
-    mimetype = pic.mimetype
+    filename = secure_filename(file.filename)
+    mimetype = file.mimetype
     if not filename or not mimetype:
         return 'Bad upload!', 400
-    img = Files(img=pic.read(),user=session['key'], name=filename, mimetype=mimetype)
+    check = Files.query.filter_by(name=filename).first()
+    if check:
+        filename = f'{str(uuid.uuid1().hex)[:6]}.{filename[-3:]}'
+        print (filename)
+    img = Files(img=file.read(),user=session['key'], name=filename, mimetype=mimetype)
     db.session.add(img)
     db.session.commit()
 
