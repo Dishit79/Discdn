@@ -6,11 +6,14 @@ To run DisCloud instance on your local machine.
 
 1. Install the code with `git clone https://github.com/Dishit79/Python-cdn.git`
 2. Install all dependencies `pip install -r requirements.txt`
-3. Create .env file like the one bellow:
+3. Create config.json file like the one bellow:
 ```
-CLIENT_ID="Discord client id" #If do not want to enable discord login, just put in a random string
-CLIENT_SECRET="Discord client secret"
-ADMIN_ACC_CODE="DISHIT" #The invite code which creates Admin accounts (never share this with anyone and reset after every use)
+{
+  "CLIENT_ID":"736035284957003816", #If do not want to enable discord login, just put in a random string
+  "CLIENT_SECRET":"RS-1C_NgpVYa2E79Tui1mj4mfYOS0LFw",
+  "REDIRECT_URI":"http://127.0.0.1:5000/user/callback",
+  "ADMIN_ACC_CODE":"DISHIT" #The invite code which creates Admin accounts (never share this with anyone and reset after every use)
+}
 ```
 4. Run the script with `python main.py`
 

@@ -2,8 +2,10 @@ from flask import Flask, request, Response, render_template,session, redirect,fl
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
+from discord import Oauth, call
+import shutil
 import uuid
-import os
+
 
 from db import db_init, db
 from model import Files,User
@@ -14,11 +16,7 @@ app.secret_key = 'somesecretkeythatonlyishouldknow'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///files.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db_init(app)
-app.config['CLIENT_ID'] = os.getenv("CLIENT_ID")
-app.config['CLIENT_SECRET'] = os.getenv("CLIENT_SECRET")
-app.config['REDIRECT_URI'] = 'http://127.0.0.1:5000/user/callback'
 
-from discord import Oauth
 
 def logged_in(f):
     @wraps(f)
@@ -50,7 +48,7 @@ def view(file,mimetype):
 @logged_in
 def files():
     files1 = Files.query.filter_by(user=session['key'])
-    return render_template("files.html", files=files1)
+    return render_template("files.html", files=files1, storage=round(shutil.disk_usage("/")[2] / (1024.0 ** 3), 1))
 
 @app.route('/manage/')
 @logged_in
@@ -124,7 +122,7 @@ def files_manage(num):
 @app.route('/user/create/', methods=['POST'])
 def createuser():
     result = request.form.to_dict()
-    if result['code'] == os.getenv("ADMIN_ACC_CODE"):
+    if result['code'] == call('ADMIN_ACC_CODE'):
         password = generate_password_hash(result['password'], method='sha256')
         user = User(username=result['username'],password=password, external_id=None, admin=True, key=str(uuid.uuid1()), invite=None)
         db.session.add(user)
