@@ -10,7 +10,7 @@ def call(dict):
 
 class Oauth(object):
     client_id=call('CLIENT_ID')
-    client_secret=call('CLIENT_ID')
+    client_secret=call('CLIENT_SECRET')
     redirect_uri=call('REDIRECT_URI')
 
     discord_login_url=f"https://discord.com/api/oauth2/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope=identify"
